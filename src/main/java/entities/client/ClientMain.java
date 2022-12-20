@@ -16,6 +16,6 @@ public class ClientMain implements MainInterface {
             log.error("Error creating a socket for client {}", e.getMessage());
         }
         Client client = new Client(socket);
-        client.handleQuestion();
+        client.handleQuestions();
     }
 }
