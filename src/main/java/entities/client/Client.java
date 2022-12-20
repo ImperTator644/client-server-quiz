@@ -1,23 +1,39 @@
 package entities.client;
 
 import entities.Entity;
+import jsonParse.StartConfigurationParserFromString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.Scanner;
 
 @Slf4j
 public class Client extends Entity {
-
-    private Scanner scanner;
+    private final Scanner scanner;
+    private final StartConfigurationParserFromString startConf;
 
     public Client(Socket socket){
         super(socket);
+        startConf = receivePropertiesFromJsonString();
+        log.info("Properties received {} and {}", Objects.requireNonNull(startConf).getAnswerTime(), startConf.getQuizName());
+        System.out.println("Starting quiz " + startConf.getQuizName());
         scanner = new Scanner(System.in);
     }
 
-    public void handleQuestion(){
+    private StartConfigurationParserFromString receivePropertiesFromJsonString(){
+        try{
+            return new StartConfigurationParserFromString(reader.readLine());
+        }
+        catch (IOException e){
+            log.error("Error reading question {}", e.getMessage());
+            closeEverything();
+            return null;
+        }
+    }
+
+    public void handleQuestions(){
         log.info("Got into handleQuestion method");
         long messageReceivedTime = 0;
         while(socket.isConnected()){
@@ -31,7 +47,7 @@ public class Client extends Entity {
                 closeEverything();
             }
             try{
-                while(System.currentTimeMillis() - messageReceivedTime < 5000) {
+                while(System.currentTimeMillis() - messageReceivedTime < startConf.getAnswerTime()) {
                     if(System.in.available() > 0) {
                         writer.write(scanner.nextLine());
                         break;
