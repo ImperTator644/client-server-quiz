@@ -1,7 +1,7 @@
 package entities.server;
 
 import entities.Entity;
-import entities.question.QuestionDataBase;
+import jsonParse.question.QuestionDataBase;
 import jsonParse.StartConfigurationParserToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,6 +10,7 @@ import java.net.Socket;
 
 @Slf4j
 public class ServerQuizService extends Entity implements Runnable {
+    private static final String DOUBLE_TAB = "\t\t";
     private final QuestionDataBase questions;
     private final String quizProperties;
     private final int id;
@@ -28,12 +29,16 @@ public class ServerQuizService extends Entity implements Runnable {
         int currentQuestion = 0;
         String clientResponse;
         sendQuizProperties();
-        while (socket.isConnected() && currentQuestion != questions.getQuestions().length) {
+        while (socket.isConnected() && currentQuestion != questions.getQuestionsCount()) {
             try {
-                this.writer.write(questions.getQuestions()[currentQuestion]);
+                this.writer.write(questions.getText(currentQuestion) + DOUBLE_TAB);
+                int iter = 1;
+                for(String answer : questions.getAnswers(currentQuestion)){
+                    this.writer.write(iter++ + ". " + answer + DOUBLE_TAB);
+                }
                 this.writer.newLine();
                 this.writer.flush();
-                log.info("Message sent succesfully {}", questions.getQuestions()[currentQuestion]);
+                log.info("Message sent succesfully {}", questions.getText(currentQuestion));
             } catch (IOException e) {
                 log.error("Error sending question {}", e.getMessage());
                 closeEverything();
