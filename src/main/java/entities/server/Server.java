@@ -16,6 +16,7 @@ public class Server {
     private final ExecutorService executorService;
 
     public void startServer() {
+        log.info("Server started");
         try {
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();

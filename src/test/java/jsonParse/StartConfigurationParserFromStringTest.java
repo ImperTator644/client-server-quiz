@@ -22,8 +22,8 @@ class StartConfigurationParserFromStringTest {
     }
 
     @Test
-    public void should_return_time_5000 () {
-        assertEquals(startConfigurationParserFromString.getAnswerTime(), 5000);
+    public void should_return_time_8000 () {
+        assertEquals(startConfigurationParserFromString.getAnswerTime(), 8000);
     }
     @Test
     public void should_return_name_KOLOKWIUM_1 () {

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StartConfigurationParserToStringTest {
-    private static final String JSON_STRING = "{\"answer-time\":\"5000\",\"quiz-name\":\"KOLOKWIUM_1\"}";
+    private static final String JSON_STRING = "{\"answer-time\":\"8000\",\"quiz-name\":\"KOLOKWIUM_1\"}";
     private StartConfigurationParserToString startConfigurationParserToString;
 
     @BeforeEach

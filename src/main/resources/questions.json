@@ -1,0 +1,63 @@
+{
+  "size": "10",
+  "1":
+            {
+              "text": "Jaka jest najdluzsza rzeka w Polsce?",
+              "answers": ["Odra", "Wisla", "Bug", "Radomka"],
+              "correct": "2"
+            },
+  "2":
+            {
+              "text": "Jaki jest najwyzszy szczyt swiata?",
+              "answers": ["Rysy","Mont Blanc","Mount Everest","K2"],
+              "correct": "3"
+            },
+  "3":
+            {
+              "text": "Ile lat ma Konrad Blicharz?",
+              "answers": ["7","16","42","11"],
+              "correct": "4"
+            },
+  "4":
+            {
+              "text": "Kto przejmuje cale stany?",
+              "answers": ["Baklazany","Amerykanie","Ogorki","Ziemniaki"],
+              "correct": "1"
+            },
+  "5":
+            {
+              "text": "Dokąd tupta noca jez?",
+              "answers": ["Do sklepu","Do baru","Do szkoly","Zadno z powyzszych"],
+              "correct": "4"
+            },
+  "6":
+            {
+              "text": "Gdzie rozgrywa sie akcja serialu \"Chlopaki z barakow\"",
+              "answers": ["Sunnyvale","Wroclaw","Raciborz","Francja"],
+              "correct": "1"
+            },
+  "7":
+            {
+              "text": "Ile zlotych?",
+              "answers": ["420","250","0","Troche"],
+              "correct": "2"
+            },
+  "8":
+            {
+              "text": "Kto napisal nowego seta?",
+              "answers": ["Warmin Anbiuren","Patryk Cyran","Paris Platynov","Jeremy Pomylka"],
+              "correct": "3"
+            },
+  "9":
+            {
+              "text": "Sent from my ...",
+              "answers": ["iPhone","iPad","MacBookPro","Wszystkie powyzsze"],
+              "correct": "4"
+            },
+  "10":
+            {
+              "text": "Gdzie wjezdza Liutisienko?",
+              "answers": ["Na napad do nas","Na dwor","Na pole","Papier recznikowy"],
+              "correct": "1"
+            }
+}
