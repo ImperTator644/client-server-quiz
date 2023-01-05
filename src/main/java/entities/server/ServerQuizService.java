@@ -64,6 +64,16 @@ public class ServerQuizService extends Entity implements Runnable {
         clientAnswers.saveAnswers();
         answers.addClientAnswers(clientAnswers, id);
         answers.saveFile();
+
+        try {
+            this.writer.write("Your score is: " + score + "/" + questions.getQuestionsCount());
+            this.writer.newLine();
+            this.writer.flush();
+            log.info("Score sent successfully {}", score);
+        } catch (IOException e) {
+            log.error("Error sending score {}", e.getMessage());
+            closeEverything();
+        }
     }
 
     private void sendQuizProperties() {
