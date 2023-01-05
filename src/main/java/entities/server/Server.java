@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @RequiredArgsConstructor
-public class Server {
+public class  Server {
 
     private final ServerSocket serverSocket;
     private final ExecutorService executorService;
