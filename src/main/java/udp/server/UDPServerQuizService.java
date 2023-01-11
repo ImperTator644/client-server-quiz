@@ -7,9 +7,7 @@ import jsonParse.question.QuestionDataBase;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.net.*;
 
 @Slf4j
 public class UDPServerQuizService implements Runnable{
@@ -25,10 +23,13 @@ public class UDPServerQuizService implements Runnable{
     private int score;
 
     private byte[] buf = new byte[256];
-    String currentMessage;
 
-    public UDPServerQuizService(DatagramSocket socket) {
-        this.socket = socket;
+    public UDPServerQuizService() {
+        try {
+            this.socket = new DatagramSocket(4446);
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
         this.questions = QuestionDataBase.getInstance();
         this.answers = Answers.getInstance();
         this.clientAnswers = new ClientAnswers();
@@ -43,17 +44,22 @@ public class UDPServerQuizService implements Runnable{
         int currentQuestion = 0;
         String clientResponse;
         sendQuizProperties();
-        while (socket.isConnected() && currentQuestion != questions.getQuestionsCount()) {
-            serverSend(questions.getText(currentQuestion) + DOUBLE_TAB);
+        while (!socket.isClosed() && currentQuestion != questions.getQuestionsCount()) {
+            String questionWithAnswers;
+            questionWithAnswers = (questions.getText(currentQuestion) + DOUBLE_TAB);
             int iter = 1;
             for (String answer : questions.getAnswers(currentQuestion)) {
-                serverSend(iter++ + ". " + answer + DOUBLE_TAB);
+                questionWithAnswers += (iter++ + ". " + answer + DOUBLE_TAB);
             }
-            serverSend("\n");
+            serverSend(questionWithAnswers);
             log.info("Message sent successfully {}", questions.getText(currentQuestion));
             clientResponse = serverRead();
+            while (clientResponse.isBlank()) {
+                clientResponse = serverRead();
+            }
+            serverSend("ACK");
             log.info("Received a message from client {}", clientResponse);
-            checkAnswer(clientResponse, currentQuestion);
+            checkAnswer(clientResponse.substring(0,1), currentQuestion);
             currentQuestion++;
         }
         clientAnswers.saveAnswers();
@@ -67,7 +73,6 @@ public class UDPServerQuizService implements Runnable{
 
     private void sendQuizProperties() {
         serverSend(quizProperties);
-        serverSend("\n");
         log.info("Properties sent successfully {}", quizProperties);
     }
 
@@ -93,24 +98,26 @@ public class UDPServerQuizService implements Runnable{
         InetAddress address = packet.getAddress();
         int port = packet.getPort();
         packet = new DatagramPacket(buf, buf.length, address, port);
-        currentMessage = new String(packet.getData(), 0, packet.getLength());
-        return currentMessage;
+        String currentMessage = new String(packet.getData(), 0, packet.getLength());
+        log.debug("Server received message: {}", currentMessage);
+        return currentMessage.trim();
     }
 
     private void serverSend(String msg) {
-        DatagramPacket packet
-                = new DatagramPacket(buf, buf.length);
+        DatagramPacket packet;
+
+        buf = msg.getBytes();
+        InetAddress address;
         try {
-            socket.receive(packet);
-        } catch (IOException e) {
+            address = InetAddress.getByName("localhost");
+        } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-
-        InetAddress address = packet.getAddress();
-        int port = packet.getPort();
+        int port = 4445;
         packet = new DatagramPacket(buf, buf.length, address, port);
         try {
             socket.send(packet);
+            log.debug("Server send message: {}", msg);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
