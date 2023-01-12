@@ -2,9 +2,14 @@ package udp.client;
 
 import jsonParse.StartConfigurationParserFromString;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 @Slf4j
@@ -12,16 +17,42 @@ public class UDPClient {
     private DatagramSocket socket;
     private final Scanner scanner;
     private StartConfigurationParserFromString startConf;
+    private Integer sendPort;
 
     private byte[] buf = new byte[256];
+    private static final String SERVER_PATH = "src/main/resources/udp-server-properties.json";
+    private static final String CLIENT_PATH = "src/main/resources/udp-client-properties.json";
+    static JSONObject port = new JSONObject();
 
-    public UDPClient() {
+    public UDPClient(Integer port) {
+        setUpProperties();
         scanner = new Scanner(System.in);
         try {
-            socket = new DatagramSocket(4445);
+            socket = new DatagramSocket(port);
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
+        setupSendPort();
+    }
+
+    private void setUpProperties() {
+        port.clear();
+        port.put("port", 32767);
+        try (PrintWriter out = new PrintWriter(new FileWriter(CLIENT_PATH))) {
+            out.write(port.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void setupSendPort() {
+        try {
+            port = new JSONObject(String.valueOf(Files.readString(Paths.get(SERVER_PATH))));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        sendPort = port.getInt("port");
+        sendPort++;
     }
 
     private StartConfigurationParserFromString receivePropertiesFromJsonString(){
@@ -85,8 +116,7 @@ public class UDPClient {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-        int port = 4446;
-        packet = new DatagramPacket(buf, buf.length, address, port);
+        packet = new DatagramPacket(buf, buf.length, address, sendPort);
         try {
             socket.send(packet);
             log.debug("Client send message: {}", msg);
@@ -110,7 +140,7 @@ public class UDPClient {
         packet = new DatagramPacket(buf, buf.length, address, port);
         try {
             socket.send(packet);
-            log.debug("Client send message: {}", "start");
+            log.info("Client send message: {}", "start");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

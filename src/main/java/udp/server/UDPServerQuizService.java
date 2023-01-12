@@ -5,9 +5,15 @@ import jsonParse.StartConfigurationParserToString;
 import jsonParse.answer.Answers;
 import jsonParse.question.QuestionDataBase;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import udp.client.UDPClient;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @Slf4j
 public class UDPServerQuizService implements Runnable{
@@ -21,12 +27,19 @@ public class UDPServerQuizService implements Runnable{
     private final int id;
     private static int nextId = 0;
     private int score;
+    private Integer sendPort;
+
+    private static final String CLIENT_PATH = "src/main/resources/udp-client-properties.json";
 
     private byte[] buf = new byte[256];
+    static JSONObject port = new JSONObject();
+    private static final String PATH = "src/main/resources/udp-server-properties.json";
 
     public UDPServerQuizService() {
+        Integer port = getServerPort();
+
         try {
-            this.socket = new DatagramSocket(4446);
+            this.socket = new DatagramSocket(port);
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
@@ -37,6 +50,38 @@ public class UDPServerQuizService implements Runnable{
                 .getJsonString();
         this.id = nextId++;
         this.score = 0;
+
+        setupSendPort();
+    }
+
+    private Integer getServerPort() {
+        try {
+            port = new JSONObject(String.valueOf(Files.readString(Paths.get(PATH))));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Integer intPort = port.getInt("port");
+        if (intPort > 32767) {
+            intPort = 1;
+        }
+        port.clear();
+        port.put("port", ++intPort);
+        try (PrintWriter out = new PrintWriter(new FileWriter(PATH))) {
+            out.write(port.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return intPort;
+    }
+
+    private void setupSendPort() {
+        try {
+            port = new JSONObject(String.valueOf(Files.readString(Paths.get(CLIENT_PATH))));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        sendPort = port.getInt("port");
+        sendPort--;
     }
 
     @Override
@@ -113,8 +158,8 @@ public class UDPServerQuizService implements Runnable{
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-        int port = 4445;
-        packet = new DatagramPacket(buf, buf.length, address, port);
+
+        packet = new DatagramPacket(buf, buf.length, address, sendPort);
         try {
             socket.send(packet);
             log.debug("Server send message: {}", msg);
