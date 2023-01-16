@@ -12,21 +12,21 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-public class QuestionDataBase {
+public class Questions {
 
     private static final String QUESTIONS_FILE = "src/main/resources/questions.json";
     private final List<JSONObject> questions;
-    private static QuestionDataBase instance = null;
+    private static Questions instance = null;
 
-    private QuestionDataBase() {
+    private Questions() {
         JSONObject wholeFile = readJsonFromFile();
         questions = new ArrayList<>();
         fillQuestionList(Objects.requireNonNull(wholeFile));
     }
 
-    public static QuestionDataBase getInstance() {
+    public static Questions getInstance() {
         if (instance == null) {
-            instance = new QuestionDataBase();
+            instance = new Questions();
         }
         return instance;
     }
@@ -82,6 +82,4 @@ public class QuestionDataBase {
         }
         return arr;
     }
-
-
 }

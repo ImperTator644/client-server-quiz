@@ -1,5 +1,6 @@
 package entities.server;
 
+import database.QuizDatabase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,9 +15,11 @@ public class  Server {
 
     private final ServerSocket serverSocket;
     private final ExecutorService executorService;
+    private QuizDatabase quizDatabase = new QuizDatabase();
 
     public void startServer() {
         log.info("Server started");
+        quizDatabase.saveAllQuestions();
         try {
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();

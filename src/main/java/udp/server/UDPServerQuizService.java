@@ -3,7 +3,7 @@ package udp.server;
 import entities.client.ClientAnswers;
 import jsonParse.StartConfigurationParserToString;
 import jsonParse.answer.Answers;
-import jsonParse.question.QuestionDataBase;
+import jsonParse.question.Questions;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import udp.client.UDPClient;
@@ -20,7 +20,7 @@ public class UDPServerQuizService implements Runnable{
 
     private static final String DOUBLE_TAB = "\t\t";
     private final DatagramSocket socket;
-    private final QuestionDataBase questions;
+    private final Questions questions;
     private final ClientAnswers clientAnswers;
     private final Answers answers;
     private final String quizProperties;
@@ -43,7 +43,7 @@ public class UDPServerQuizService implements Runnable{
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
-        this.questions = QuestionDataBase.getInstance();
+        this.questions = Questions.getInstance();
         this.answers = Answers.getInstance();
         this.clientAnswers = new ClientAnswers();
         quizProperties = StartConfigurationParserToString.getInstance()
